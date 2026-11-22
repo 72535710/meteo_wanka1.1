@@ -1,0 +1,70 @@
+<footer class="footer-wrapper mt-auto">
+  <div class="footer-top py-5">
+    <div class="container">
+      <div class="row g-4">
+        <!-- Columna 1: Presentación -->
+        <div class="col-lg-4 col-md-6">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-cloud-sun text-tierra fs-3"></i>
+            <h4 class="mb-0 text-white font-heading">METEO WANKA 1.1</h4>
+          </div>
+          <p class="text-footer-muted small">
+            Plataforma universitaria de asistencia agroclimática diseñada para fortalecer la toma de decisiones preventivas de las comunidades agrícolas del Valle del Mantaro frente a eventos climáticos extremos.
+          </p>
+          <div class="d-flex align-items-center gap-2 text-salvia small">
+            <i class="bi bi-geo-alt"></i>
+            <span>Junín · Valle del Mantaro · Perú</span>
+          </div>
+        </div>
+
+        <!-- Columna 2: Módulos del Sistema -->
+        <div class="col-lg-3 col-md-6">
+          <h5 class="text-white mb-3">Módulos</h5>
+          <ul class="list-unstyled footer-links">
+            <li><a routerLink="/inicio"><i class="bi bi-chevron-right me-1"></i> Inicio y Clima Actual</a></li>
+            <li><a routerLink="/alertas"><i class="bi bi-chevron-right me-1"></i> Alertas Agroclimáticas</a></li>
+            <li><a routerLink="/bitacora"><i class="bi bi-chevron-right me-1"></i> Bitácora Histórica</a></li>
+            <li><a routerLink="/cultivos"><i class="bi bi-chevron-right me-1"></i> Fichas de Cultivos</a></li>
+            <li><a routerLink="/admin"><i class="bi bi-chevron-right me-1"></i> Panel de Administración</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 3: Cultivos Prioritarios -->
+        <div class="col-lg-2 col-md-6">
+          <h5 class="text-white mb-3">Cultivos</h5>
+          <ul class="list-unstyled footer-links">
+            <li><a routerLink="/cultivos"><i class="bi bi-dot"></i> Papa Andina</a></li>
+            <li><a routerLink="/cultivos"><i class="bi bi-dot"></i> Maíz Mantaro</a></li>
+            <li><a routerLink="/cultivos"><i class="bi bi-dot"></i> Trigo Serrano</a></li>
+            <li><a routerLink="/cultivos"><i class="bi bi-dot"></i> Haba Verde</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 4: Arquitectura y Tecnologías -->
+        <div class="col-lg-3 col-md-6">
+          <h5 class="text-white mb-3">Tecnología</h5>
+          <p class="text-footer-muted small mb-2">
+            Desarrollado en <strong>Angular</strong> con arquitectura Standalone, Bootstrap 5 y TypeScript.
+          </p>
+          <div class="p-2 rounded bg-black-20 border border-secondary border-opacity-25 small text-footer-muted">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge bg-success-subtle text-success border border-success-subtle">FastAPI Ready</span>
+              <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Mock Data</span>
+            </div>
+            <span>Preparado para integración REST con endpoints en Python y base de datos SQL Server.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Copyright -->
+  <div class="footer-bottom py-3 border-top border-secondary border-opacity-25">
+    <div class="container text-center text-footer-muted small">
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+        <span>&copy; {{ currentYear }} METEO WANKA 1.1 · Proyecto Universitario de Asistencia Agroclimática</span>
+        <span>Valle del Mantaro, Junín, Perú</span>
+      </div>
+    </div>
+  </div>
+</footer>

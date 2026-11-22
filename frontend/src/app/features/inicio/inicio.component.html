@@ -1,0 +1,312 @@
+<div class="inicio-page py-4">
+  <div class="container">
+    
+    <!-- Hero Banner con Localidad y Contexto -->
+    <section class="hero-valley mb-4 p-4 p-lg-5 rounded-4 shadow-sm position-relative overflow-hidden">
+      <div class="row align-items-center position-relative z-1">
+        <div class="col-lg-8">
+          <span class="badge bg-white text-dark mb-2 px-3 py-2 fw-semibold border">
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+            {{ localityService.selectedLocality()?.name }} · {{ localityService.selectedLocality()?.province }}@if (localityService.selectedLocality()?.altitudeMeters != null) { ({{ localityService.selectedLocality()?.altitudeMeters }} msnm) }
+          </span>
+          <h1 class="display-6 fw-bold text-white mb-2 font-heading">
+            Monitoreo Agroclimático en Tiempo Real
+          </h1>
+          <p class="text-white text-opacity-90 lead mb-3 fs-6">
+            Información meteorológica precisa y recomendaciones agronómicas para los productores de papa, maíz, trigo y haba del Valle del Mantaro.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <a routerLink="/alertas" class="btn btn-mw-tierra">
+              <i class="bi bi-exclamation-triangle-fill"></i> Ver Alertas Activas ({{ activeAlerts.length }})
+            </a>
+            <a routerLink="/cultivos" class="btn btn-outline-light">
+              <i class="bi bi-book"></i> Guía de Cultivos
+            </a>
+          </div>
+        </div>
+        <div class="col-lg-4 text-center d-none d-lg-block">
+          <div class="hero-stats-badge p-3 rounded-3 text-start">
+            <div class="small text-white-50 text-uppercase fw-semibold mb-1">Cultivos Principales de la Zona</div>
+            <div class="d-flex flex-wrap gap-1 mb-2">
+              @for (crop of localityService.selectedLocality()?.mainCrops ?? []; track crop) {
+                <span class="badge bg-light text-dark fw-normal">{{ crop }}</span>
+              }
+            </div>
+            <div class="small text-white text-opacity-75">
+              <i class="bi bi-clock-history me-1"></i> Actualización: {{ currentWeather()?.recordedAt || '—' }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-overlay"></div>
+    </section>
+
+    <!-- Fila Principal: Clima Actual y Métricas -->
+    <div class="row g-4 mb-4">
+      
+      <!-- Tarjeta de Clima Actual de la Localidad -->
+      <div class="col-lg-7">
+        <div class="mw-card p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <span class="text-muted small text-uppercase fw-semibold">Condición Meteorológica Actual</span>
+                <h3 class="mb-0 font-heading text-verde-campo">{{ localityService.selectedLocality()?.name }}</h3>
+              </div>
+              <span class="badge bg-light text-secondary border px-3 py-2">
+                <i class="bi bi-broadcast me-1 text-success"></i> Estación Mantaro
+              </span>
+            </div>
+
+            @if (isLoading()) {
+              <div class="alert alert-info my-3" role="status">Consultando el clima...</div>
+            } @else if (weatherError()) {
+              <div class="alert alert-danger my-3" role="alert">{{ weatherError() }}</div>
+            } @else if (currentWeather(); as weather) {
+            <div class="d-flex align-items-center gap-4 my-3 p-3 rounded-3 bg-crema-surface border">
+              <div class="weather-big-icon text-verde-campo">
+                <i class="bi" [ngClass]="weather.icon"></i>
+              </div>
+              <div>
+                <div class="display-3 fw-bold text-dark lh-1">
+                  {{ weather.temperature }}<span class="fs-2 text-muted fw-normal">°C</span>
+                </div>
+                <div class="fw-semibold text-verde-campo mt-1 fs-5">
+                  {{ weather.condition }}
+                </div>
+                <div class="text-muted small">
+                  @if (weather.thermalSensation !== undefined) { Sensación térmica: <strong>{{ weather.thermalSensation }} °C</strong> · }
+                  Viento: {{ weather.windSpeed }} km/h
+                </div>
+              </div>
+            </div>
+
+            <!-- Métricas meteorológicas recibidas desde FastAPI -->
+            <div class="row g-3 mt-1">
+              <div class="col-6 col-sm-4 col-lg">
+                <div class="weather-metric-box">
+                  <i class="bi bi-thermometer-half text-danger fs-4"></i>
+                  <div class="weather-metric-val">{{ weather.temperature }} °C</div>
+                  <div class="weather-metric-label">Temperatura</div>
+                </div>
+              </div>
+              @if (weather.thermalSensation !== undefined) {
+              <div class="col-6 col-sm-4 col-lg">
+                <div class="weather-metric-box">
+                  <i class="bi bi-thermometer-sun text-warning fs-4"></i>
+                  <div class="weather-metric-val">{{ weather.thermalSensation }} °C</div>
+                  <div class="weather-metric-label">Sensación térmica</div>
+                </div>
+              </div>
+              }
+              @if (weather.atmosphericPressure !== undefined) {
+              <div class="col-6 col-sm-4 col-lg">
+                <div class="weather-metric-box">
+                  <i class="bi bi-speedometer2 text-secondary fs-4"></i>
+                  <div class="weather-metric-val">{{ weather.atmosphericPressure }} hPa</div>
+                  <div class="weather-metric-label">Presión</div>
+                </div>
+              </div>
+              }
+              <div class="col-6 col-sm-4 col-lg">
+                <div class="weather-metric-box">
+                  <i class="bi bi-droplet-half text-primary fs-4"></i>
+                  <div class="weather-metric-val">{{ weather.humidity }} %</div>
+                  <div class="weather-metric-label">Humedad Rel.</div>
+                </div>
+              </div>
+              <div class="col-6 col-sm-4 col-lg">
+                <div class="weather-metric-box">
+                  <i class="bi bi-cloud-rain text-info fs-4"></i>
+                  <div class="weather-metric-val">{{ weather.precipitation }} mm</div>
+                  <div class="weather-metric-label">Precipitación</div>
+                </div>
+              </div>
+              <div class="col-6 col-sm-4 col-lg">
+                <div class="weather-metric-box">
+                  <i class="bi bi-wind text-secondary fs-4"></i>
+                  <div class="weather-metric-val">{{ weather.windSpeed }} <span class="fs-6">km/h</span></div>
+                  <div class="weather-metric-label">Velocidad Viento</div>
+                </div>
+              </div>
+            </div>
+          }
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección Destacada de Recomendación Agrícola -->
+      <div class="col-lg-5">
+        <div class="mw-card p-4 h-100 d-flex flex-column justify-content-between border-top border-4 border-tierra">
+          @if (featuredRecommendation) {
+          <div>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="badge bg-tierra-subtle text-tierra fw-semibold px-2 py-1">
+                <i class="bi bi-lightbulb-fill me-1"></i> Recomendación Agrícola del Día
+              </span>
+              <span class="badge bg-danger-subtle text-danger fw-semibold text-uppercase">
+                Prioridad {{ featuredRecommendation?.priority }}
+              </span>
+            </div>
+            <p class="text-muted extra-small mb-2">Recomendación de muestra: no hay endpoint GET compatible en el backend.</p>
+            
+            <h4 class="font-heading mb-2 text-dark">{{ featuredRecommendation?.title }}</h4>
+            
+            <div class="d-flex gap-2 mb-3 small text-muted">
+              <span><i class="bi bi-flower1 me-1 text-verde-campo"></i>{{ featuredRecommendation?.cropName }}</span>
+              <span>•</span>
+              <span><i class="bi bi-geo-alt me-1 text-danger"></i>{{ featuredRecommendation?.localityName }}</span>
+            </div>
+
+            <p class="text-secondary small mb-3">
+              {{ featuredRecommendation?.description }}
+            </p>
+
+            <!-- Acciones Preventivas Clave -->
+            <div class="recommendation-steps-box p-3 rounded-3 bg-crema-surface border">
+              <div class="fw-semibold small text-dark mb-2">
+                <i class="bi bi-check2-circle text-verde-campo me-1"></i> Pasos Recomendados para el Agricultor:
+              </div>
+              <ul class="list-unstyled mb-0 small">
+                @for (step of featuredRecommendation?.actionSteps; track step; let idx = $index) {
+                  <li class="mb-2 d-flex align-items-start gap-2">
+                    <span class="step-number">{{ idx + 1 }}</span>
+                    <span>{{ step }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+          } @else {
+              <p class="text-muted mb-0">No hay una recomendación destacada disponible.</p>
+            }
+
+          <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center">
+            <span class="small text-muted fst-italic">{{ featuredRecommendation?.author }}</span>
+            <a routerLink="/alertas" class="btn btn-sm btn-outline-secondary">
+              Ver Protocolos <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pronóstico de los Próximos Días -->
+    <section class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h3 class="font-heading mb-0">Pronóstico Agroclimático Extendido</h3>
+          <p class="text-muted small mb-0">Comportamiento esperado para la cuenca agrícola durante los próximos días</p>
+        </div>
+        <span class="badge bg-light text-muted border d-none d-sm-inline-block">5 Días · Valle del Mantaro</span>
+      </div>
+
+      @if (isLoading()) {
+        <div class="alert alert-info" role="status">Consultando el pronóstico...</div>
+      } @else if (weatherError()) {
+        <div class="alert alert-danger" role="alert">{{ weatherError() }}</div>
+      } @else if (forecast().length === 0) {
+        <div class="alert alert-light border" role="status">El backend no devolvió días de pronóstico.</div>
+      } @else {
+      <div class="row g-3">
+        @for (item of forecast(); track item.date) {
+          <div class="col-12 col-md-6 col-lg">
+            <div class="mw-card p-3 h-100 text-center forecast-card">
+              <div class="fw-bold text-verde-campo mb-1">{{ item.dayName }}</div>
+              <div class="text-muted small mb-2">{{ item.date }}</div>
+              
+              <div class="forecast-icon-box my-2">
+                <i class="bi fs-1" [ngClass]="item.icon"></i>
+              </div>
+
+              <div class="fw-semibold text-dark small mb-1">{{ item.condition }}</div>
+
+              <div class="d-flex justify-content-center align-items-baseline gap-2 mb-2">
+                <span class="fw-bold text-danger fs-5">{{ item.maxTemp }}°</span>
+                <span class="text-muted small">/</span>
+                <span class="fw-bold text-primary fs-6">{{ item.minTemp }}°</span>
+              </div>
+
+              <div class="p-2 rounded bg-light small mb-2">
+                <div class="d-flex justify-content-between text-muted" style="font-size: 0.76rem;">
+                  <span><i class="bi bi-umbrella me-1 text-primary"></i>Lluvia</span>
+                  <strong>{{ item.precipitationProb == null ? '—' : item.precipitationProb + '%' }}</strong>
+                </div>
+                <div class="d-flex justify-content-between text-muted" style="font-size: 0.76rem;">
+                  <span><i class="bi bi-cloud-rain me-1 text-info"></i>Precipitación</span>
+                  <span>{{ item.precipitationTotal }} mm</span>
+                </div>
+                <div class="d-flex justify-content-between text-muted" style="font-size: 0.76rem;">
+                  <span><i class="bi bi-wind me-1 text-secondary"></i>Viento</span>
+                  <span>{{ item.windSpeed }} km/h</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
+      </div>
+      }
+    </section>
+
+    <!-- Resumen de Alertas Activas para Acción Inmediata -->
+    <section class="mb-2">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h3 class="font-heading mb-0 text-dark">Alertas Agroclimáticas en Curso</h3>
+          <p class="text-muted small mb-0">Avisos vigentes que requieren vigilancia en parcelas</p>
+        </div>
+        <a routerLink="/alertas" class="btn btn-sm btn-mw-secondary">
+          Consultar Todas ({{ activeAlerts.length }}) <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+
+      @if (isLoadingAlerts) {
+        <div class="alert alert-info" role="status">Consultando alertas...</div>
+      } @else if (alertsError) {
+        <div class="alert alert-danger" role="alert">{{ alertsError }}</div>
+      } @else if (activeAlerts.length === 0) {
+        <div class="alert alert-light border" role="status">No hay alertas activas registradas.</div>
+      } @else {
+      <div class="row g-3">
+        @for (alert of activeAlerts; track alert.id) {
+          <div class="col-lg-4 col-md-6">
+            <div class="mw-card p-3 h-100 d-flex flex-column justify-content-between border-start border-4"
+                 [ngClass]="alert.riskLevel === 'critico' ? 'border-danger' : alert.riskLevel === 'alto' ? 'border-warning' : 'border-info'">
+              <div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <app-alert-type-badge [type]="alert.type" [label]="alert.typeLabel"></app-alert-type-badge>
+                  <app-risk-badge [level]="alert.riskLevel" [label]="alert.riskLabel"></app-risk-badge>
+                </div>
+
+                <h5 class="fw-bold mb-1 fs-6 text-dark">{{ alert.title }}</h5>
+                <div class="text-muted small mb-2">
+                  <i class="bi bi-geo-alt me-1 text-danger"></i>
+                  <strong>{{ alert.localityName }}</strong>@if (alert.validUntil) { · Vigente hasta {{ alert.validUntil }} }
+                </div>
+
+                <p class="text-secondary small mb-3">
+                  {{ alert.description }}
+                </p>
+
+                @if (alert.preventiveRecommendation) {
+                  <div class="alert alert-warning py-2 px-3 small mb-2 border-0 bg-warning-subtle text-dark">
+                    <strong><i class="bi bi-shield-exclamation me-1"></i>Acción preventiva:</strong> {{ alert.preventiveRecommendation }}
+                  </div>
+                }
+              </div>
+
+              <div class="mt-2 pt-2 border-top d-flex justify-content-between align-items-center small text-muted">
+                @if (alert.affectedCrops?.length) { <span>Cultivos: {{ alert.affectedCrops?.join(', ') }}</span> }
+                <a routerLink="/alertas" class="text-verde-campo fw-semibold">Detalles</a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      }
+    </section>
+
+  </div>
+</div>

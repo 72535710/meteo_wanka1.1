@@ -1,0 +1,251 @@
+<div class="bitacora-page py-4">
+  <div class="container">
+    
+    <!-- Encabezado de la Bitácora -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+      <div>
+        <span class="badge bg-verde-salvia text-dark fw-semibold px-2 py-1 mb-1">
+          <i class="bi bi-clock-history me-1"></i> Archivo Agroclimático
+        </span>
+        <h1 class="display-6 font-heading mb-1 text-dark">Bitácora de Eventos Meteorológicos</h1>
+        <p class="text-muted mb-0 small">
+          Registro histórico y trazabilidad de alertas detectadas en el Valle del Mantaro para el análisis de tendencias.
+        </p>
+      </div>
+      <div class="mt-3 mt-md-0">
+        <span class="badge bg-light text-dark border px-3 py-2">
+          Mostrando <strong>{{ filteredAlerts.length }}</strong> de <strong>{{ allAlerts.length }}</strong> eventos
+        </span>
+      </div>
+    </div>
+
+    <!-- Barra de filtros -->
+    <div class="mw-card p-3 mb-4 bg-white">
+      <div class="row g-3 align-items-end">
+        <!-- Filtro por Localidad -->
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label-mw small">
+            <i class="bi bi-geo-alt me-1 text-verde-campo"></i> Filtrar por Localidad:
+          </label>
+          <select class="form-select form-select-sm form-select-mw" [(ngModel)]="selectedLocality" (change)="applyFilters()">
+            <option value="all">Todas las localidades del Valle</option>
+            @for (loc of localities; track loc.id) {
+              <option [value]="loc.id">{{ loc.name }} ({{ loc.province }})</option>
+            }
+          </select>
+        </div>
+
+        <!-- Filtro por Tipo de Alerta -->
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label-mw small">
+            <i class="bi bi-funnel me-1 text-verde-campo"></i> Filtrar por Tipo de Alerta:
+          </label>
+          <select class="form-select form-select-sm form-select-mw" [(ngModel)]="selectedType" (change)="applyFilters()">
+            <option value="">Todos los tipos</option>
+            <option value="helada">Heladas</option>
+            <option value="lluvia_intensa">Lluvias Intensas</option>
+            <option value="temperatura_elevada">Temperaturas Elevadas</option>
+          </select>
+        </div>
+
+        <div class="col-md-2 col-sm-6">
+          <label class="form-label-mw small">
+            <i class="bi bi-check2-circle me-1 text-verde-campo"></i> Estado:
+          </label>
+          <select class="form-select form-select-sm form-select-mw" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+            <option value="">Todos los estados</option>
+            @for (status of availableStatuses; track status) {
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Buscador Adicional -->
+        <div class="col-md-3 col-sm-8">
+          <label class="form-label-mw small">
+            <i class="bi bi-search me-1 text-muted"></i> Buscar en el registro:
+          </label>
+          <input 
+            type="text" 
+            class="form-control form-control-sm form-control-mw" 
+            placeholder="Buscar por palabra clave..."
+            [(ngModel)]="searchQuery" 
+            (input)="applyFilters()">
+        </div>
+
+        <!-- Botón Limpiar -->
+        <div class="col-md-1 col-sm-4">
+          <button class="btn btn-sm btn-outline-secondary w-100" (click)="resetFilters()" title="Restablecer">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Historial de Alertas Registradas -->
+    <div class="mw-card overflow-hidden">
+      <div class="table-responsive">
+        @if (isLoading) {
+          <div class="alert alert-info m-3" role="status">Cargando bitácora...</div>
+        } @else if (errorMessage) {
+          <div class="alert alert-danger m-3" role="alert">{{ errorMessage }}</div>
+        } @else {
+        <table class="table table-mw mb-0">
+          <thead>
+            <tr>
+              <th scope="col" style="width: 15%;">Fecha de Detección</th>
+              <th scope="col" style="width: 18%;">Tipo de Alerta</th>
+              <th scope="col" style="width: 18%;">Localidad</th>
+              <th scope="col" style="width: 16%;">Nivel de Riesgo</th>
+              <th scope="col" style="width: 10%;">Estado</th>
+              <th scope="col">Título del Evento</th>
+              <th scope="col" class="text-end" style="width: 15%;">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (filteredAlerts.length === 0) {
+              <tr>
+                <td colspan="7" class="text-center py-5 text-muted">
+                  <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                  No se encontraron eventos en la bitácora con los filtros aplicados.
+                </td>
+              </tr>
+            } @else {
+              @for (item of filteredAlerts; track item.id) {
+                <tr>
+                  <td>
+                    <span class="fw-semibold text-dark">{{ item.detectedAt }}</span>
+                  </td>
+                  <td>
+                    <app-alert-type-badge [type]="item.type" [label]="item.typeLabel"></app-alert-type-badge>
+                  </td>
+                  <td>
+                    <span class="fw-semibold text-verde-campo">{{ item.localityName }}</span>
+                  </td>
+                  <td>
+                    <app-risk-badge [level]="item.riskLevel" [label]="item.riskLabel"></app-risk-badge>
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-dark border">{{ item.status }}</span>
+                  </td>
+                  <td>
+                    <div class="fw-semibold text-dark text-truncate" style="max-width: 280px;" title="{{ item.title }}">
+                      {{ item.title }}
+                    </div>
+                    <small class="text-muted text-truncate d-block" style="max-width: 280px;">
+                      {{ item.description }}
+                    </small>
+                    @if (item.recommendationTitle) {
+                      <small class="text-tierra d-block mt-1">
+                        Recomendación: {{ item.recommendationTitle }}
+                      </small>
+                    }
+                  </td>
+                  <td class="text-end">
+                    <button 
+                      class="btn btn-sm btn-mw-secondary"
+                      (click)="openRecordModal(item)">
+                      <i class="bi bi-eye me-1"></i> Consultar Detalles
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+        }
+      </div>
+    </div>
+
+    <!-- Leyenda Informativa -->
+    <div class="mt-3 p-3 bg-white rounded-3 border d-flex flex-wrap align-items-center justify-content-between gap-2 small text-muted">
+      <div>
+        <i class="bi bi-shield-check text-success me-1"></i>
+        <span>Los registros de la bitácora alimentan el historial de eventos agroclimáticos del valle para futuros modelos predictivos.</span>
+      </div>
+      <div>
+        <span class="badge bg-secondary-subtle text-secondary border">Datos de la bitácora del backend</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Detallado de Consulta de Registro de Bitácora -->
+@if (selectedRecord) {
+  <div class="mw-modal-backdrop animate-fade-in" (click)="closeRecordModal()">
+    <div class="mw-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="mw-modal-header">
+        <div>
+          <span class="small text-muted text-uppercase fw-semibold">Detalle del Registro Histórico</span>
+          <h5 class="modal-title font-heading mb-0 text-dark">{{ selectedRecord.title }}</h5>
+        </div>
+        <button type="button" class="btn-close shadow-none" (click)="closeRecordModal()" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="mw-modal-body">
+        <!-- Badges y Metadatos -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <app-alert-type-badge [type]="selectedRecord.type" [label]="selectedRecord.typeLabel"></app-alert-type-badge>
+          <app-risk-badge [level]="selectedRecord.riskLevel" [label]="selectedRecord.riskLabel"></app-risk-badge>
+          <span class="badge bg-light text-dark border">
+            Estado: <strong>{{ selectedRecord.status }}</strong>
+          </span>
+        </div>
+
+        <div class="row g-2 mb-3 small">
+          <div class="col-sm-6">
+            <div class="p-2 rounded bg-light border">
+              <span class="text-muted d-block">Localidad Afectada:</span>
+              <strong class="text-verde-campo">{{ selectedRecord.localityName }}</strong>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-2 rounded bg-light border">
+              <span class="text-muted d-block">Fecha y Hora de Detección:</span>
+              <strong>{{ selectedRecord.detectedAt }}</strong>
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="p-2 rounded bg-light border">
+              <span class="text-muted d-block">Periodo de Cobertura / Vigencia:</span>
+              <span>{{ selectedRecord.detectedAt }}@if (selectedRecord.validUntil) { al {{ selectedRecord.validUntil }} }</span>
+            </div>
+          </div>
+        </div>
+
+        <h6 class="fw-bold mb-1">Descripción Técnica del Evento:</h6>
+        <p class="small text-secondary mb-3">
+          {{ selectedRecord.description }}
+        </p>
+
+        @if (selectedRecord.recommendationTitle || selectedRecord.preventiveRecommendation) {
+        <h6 class="fw-bold mb-1 text-tierra">Recomendación Preventiva Emitida:</h6>
+        <div class="p-3 rounded bg-crema-surface border border-tierra small mb-3">
+          @if (selectedRecord.recommendationTitle) {
+            <div class="fw-semibold">{{ selectedRecord.recommendationTitle }}</div>
+          }
+          @if (selectedRecord.preventiveRecommendation) {
+            <div>{{ selectedRecord.preventiveRecommendation }}</div>
+          }
+        </div>
+        }
+
+        @if (selectedRecord.affectedCrops?.length) {
+        <h6 class="fw-bold mb-1">Cultivos Monitoreados en este Evento:</h6>
+        <div class="d-flex flex-wrap gap-1 mb-2">
+          @for (c of selectedRecord.affectedCrops; track c) {
+            <span class="badge bg-verde-campo text-white px-2 py-1">{{ c }}</span>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="mw-modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeRecordModal()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+}

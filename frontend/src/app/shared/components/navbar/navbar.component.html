@@ -1,0 +1,80 @@
+@if (localityError) {
+  <div class="alert alert-danger rounded-0 mb-0 py-2" role="alert">{{ localityError }}</div>
+}
+
+<!-- Barra de Navegación Principal -->
+<header class="navbar-wrapper shadow-sm sticky-top">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-verde-campo py-2">
+    <div class="container-fluid px-lg-4">
+      <!-- Marca e Identidad -->
+      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/inicio" (click)="closeMenu()">
+        <div class="brand-icon-box">
+          <i class="bi bi-cloud-sun-fill text-crema"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">METEO WANKA <span class="brand-badge">1.1</span></span>
+          <span class="brand-subtitle d-none d-sm-block">Asistencia Agroclimática · Valle del Mantaro</span>
+        </div>
+      </a>
+
+      <!-- Selector de Localidad Activa (Desktop y Mobile) -->
+      <div class="d-flex align-items-center me-2 me-lg-3 order-lg-2">
+        <div class="locality-selector-wrap">
+          <i class="bi bi-geo-alt-fill text-salvia me-1"></i>
+          <select 
+            class="form-select form-select-sm locality-select"
+            [value]="localityService.selectedLocality()?.id ?? ''"
+            (change)="onLocalityChange($event)"
+            [disabled]="localities.length === 0"
+            title="Seleccionar localidad del Valle del Mantaro"
+            aria-label="Seleccionar localidad del Valle del Mantaro">
+            @for (loc of localities; track loc.id) {
+              <option [value]="loc.id">{{ loc.name }}@if (loc.altitudeMeters !== null) { ({{ loc.altitudeMeters }} msnm) }</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Responsive -->
+      <button 
+        class="navbar-toggler border-0 shadow-none px-2" 
+        type="button" 
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="!isMenuCollapsed"
+        aria-label="Abrir menú de navegación">
+        <i class="bi bi-list fs-2 text-white"></i>
+      </button>
+
+      <!-- Enlaces de Navegación -->
+      <div class="collapse navbar-collapse order-lg-1" [class.show]="!isMenuCollapsed">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 py-2 py-lg-0">
+          <li class="nav-item">
+            <a class="nav-link custom-nav-link" routerLink="/inicio" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-house-door me-1"></i> Inicio
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link custom-nav-link" routerLink="/alertas" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-exclamation-triangle me-1"></i> Alertas
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link custom-nav-link" routerLink="/bitacora" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-journal-text me-1"></i> Bitácora
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link custom-nav-link" routerLink="/cultivos" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-flower1 me-1"></i> Cultivos
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link custom-nav-link admin-nav-link" routerLink="/admin" routerLinkActive="active" (click)="closeMenu()">
+              <i class="bi bi-gear me-1"></i> Administración
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,47 @@
+.admin-pill-btn {
+  background-color: #FFFFFF;
+  color: var(--mw-grafito);
+  border: 1px solid var(--mw-border);
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.admin-pill-btn:hover {
+  background-color: var(--mw-crema-surface);
+  color: var(--mw-verde-campo-dark);
+}
+
+.admin-pill-btn.active {
+  background-color: var(--mw-verde-campo) !important;
+  color: #FFFFFF !important;
+  border-color: var(--mw-verde-campo-dark) !important;
+  box-shadow: 0 2px 8px rgba(53, 92, 67, 0.25);
+}
+
+.text-verde-campo {
+  color: var(--mw-verde-campo);
+}
+
+.bg-verde-campo {
+  background-color: var(--mw-verde-campo);
+}
+
+.text-tierra {
+  color: var(--mw-tierra);
+}
+
+.bg-crema-surface {
+  background-color: var(--mw-crema-surface);
+}
+
+.bg-verde-salvia {
+  background-color: var(--mw-verde-salvia-light);
+  border: 1px solid var(--mw-verde-salvia);
+}
+
+.extra-small {
+  font-size: 0.72rem;
+}

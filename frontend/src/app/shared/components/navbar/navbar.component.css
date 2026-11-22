@@ -1,0 +1,113 @@
+.bg-verde-campo {
+  background-color: var(--mw-verde-campo);
+  border-bottom: 2px solid var(--mw-verde-campo-dark);
+}
+
+.brand-icon-box {
+  width: 38px;
+  height: 38px;
+  background-color: rgba(245, 241, 231, 0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  border: 1px solid rgba(245, 241, 231, 0.25);
+}
+
+.text-crema {
+  color: var(--mw-crema-natural);
+}
+
+.text-salvia {
+  color: #C1D0BC;
+}
+
+.brand-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+  display: block;
+  line-height: 1.1;
+}
+
+.brand-badge {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  background-color: var(--mw-tierra);
+  color: #FFFFFF;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.brand-subtitle {
+  font-size: 0.72rem;
+  color: rgba(245, 241, 231, 0.85);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.custom-nav-link {
+  color: rgba(255, 255, 255, 0.88) !important;
+  font-weight: 500;
+  font-size: 0.93rem;
+  padding: 0.5rem 0.85rem !important;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.custom-nav-link:hover {
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.custom-nav-link.active {
+  color: #FFFFFF !important;
+  background-color: var(--mw-verde-campo-dark);
+  font-weight: 600;
+  border-bottom: 2px solid var(--mw-tierra);
+}
+
+.admin-nav-link {
+  color: #E2ECD8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  margin-left: 0.5rem;
+}
+
+.locality-selector-wrap {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 0.2rem 0.5rem;
+}
+
+.locality-select {
+  background-color: transparent;
+  color: #FFFFFF;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding-right: 1.5rem;
+  cursor: pointer;
+}
+
+.locality-select option {
+  background-color: var(--mw-verde-campo-dark);
+  color: #FFFFFF;
+}
+
+.locality-select:focus {
+  background-color: transparent;
+  color: #FFFFFF;
+  box-shadow: none;
+  outline: none;
+}

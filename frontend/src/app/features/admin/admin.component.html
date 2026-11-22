@@ -1,0 +1,676 @@
+<div class="admin-page py-4">
+  <div class="container">
+    
+    <!-- Toast de Notificación -->
+    @if (notification) {
+      <div class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+        <div class="alert shadow-sm border-0 d-flex align-items-center gap-2 mb-0" 
+             [ngClass]="notification.type === 'success' ? 'alert-success' : 'alert-danger'">
+          <i class="bi" [ngClass]="notification.type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+          <span>{{ notification.message }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Encabezado del Panel de Administración -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+      <div>
+        <span class="badge bg-dark text-white fw-semibold px-2 py-1 mb-1">
+          <i class="bi bi-sliders me-1"></i> Panel de Configuración y Gestión
+        </span>
+        <h1 class="display-6 font-heading mb-1 text-dark">Administración Agroclimática</h1>
+        <p class="text-muted mb-0 small">
+          Mantenimiento de localidades del Valle del Mantaro, emisión de alertas y gestión de recomendaciones técnicas.
+        </p>
+      </div>
+      <div class="mt-3 mt-md-0">
+        <span class="badge bg-warning-subtle text-dark border border-warning px-3 py-2 small">
+          <i class="bi bi-shield-lock me-1"></i> Entorno local · Sin Autenticación
+        </span>
+      </div>
+    </div>
+
+    <!-- Pestañas de Navegación del Módulo Admin -->
+    <div class="admin-nav-tabs mb-4">
+      <ul class="nav nav-pills gap-2">
+        <li class="nav-item">
+          <button 
+            class="nav-link admin-pill-btn"
+            [class.active]="activeTab === 'localidades'"
+            (click)="setTab('localidades')">
+            <i class="bi bi-geo-alt me-1"></i> Localidades ({{ localities.length }})
+          </button>
+        </li>
+        <li class="nav-item">
+          <button 
+            class="nav-link admin-pill-btn"
+            [class.active]="activeTab === 'alertas'"
+            (click)="setTab('alertas')">
+            <i class="bi bi-exclamation-triangle me-1"></i> Alertas Meteorológicas ({{ alerts.length }})
+          </button>
+        </li>
+        <li class="nav-item">
+          <button 
+            class="nav-link admin-pill-btn"
+            [class.active]="activeTab === 'recomendaciones'"
+            (click)="setTab('recomendaciones')">
+            <i class="bi bi-lightbulb me-1"></i> Recomendaciones Agrícolas ({{ recommendations.length }})
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 1. GESTIÓN DE LOCALIDADES -->
+    <!-- ========================================================================= -->
+    @if (activeTab === 'localidades') {
+      <div class="row g-4 animate-fade-in">
+        
+        <!-- Formulario de Localidad (Registro y Edición) -->
+        <div class="col-lg-4">
+          <div class="mw-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="font-heading mb-0 text-dark">
+                Nueva Localidad
+              </h5>
+            </div>
+
+            <form [formGroup]="localityForm" (ngSubmit)="saveLocality()">
+              
+              <div class="mb-3">
+                <label class="form-label-mw">Nombre de la Localidad *</label>
+                <input 
+                  type="text" 
+                  class="form-control form-control-mw"
+                  placeholder="Ej. Sicaya, Concepción"
+                  formControlName="name"
+                  [class.is-invalid-mw]="localityForm.get('name')?.invalid && localityForm.get('name')?.touched">
+                @if (localityForm.get('name')?.invalid && localityForm.get('name')?.touched) {
+                  <div class="invalid-feedback-mw">El nombre es requerido (mínimo 3 caracteres).</div>
+                }
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-mw">Provincia *</label>
+                <input type="text" class="form-control form-control-mw" formControlName="province">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-mw">Altitud (msnm) *</label>
+                <input 
+                  type="number" 
+                  class="form-control form-control-mw"
+                  placeholder="Ej. 3259"
+                  formControlName="altitudeMeters"
+                  [class.is-invalid-mw]="localityForm.get('altitudeMeters')?.invalid && localityForm.get('altitudeMeters')?.touched">
+                @if (localityForm.get('altitudeMeters')?.invalid && localityForm.get('altitudeMeters')?.touched) {
+                  <div class="invalid-feedback-mw">Ingrese una altitud válida (0 a 7,000 msnm).</div>
+                }
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-mw-primary">
+                  <i class="bi bi-plus-circle"></i> Guardar Localidad
+                </button>
+              </div>
+              <p class="text-muted small mt-3 mb-0">La API guarda nombre, provincia y altitud. No hay endpoints para editar o eliminar localidades.</p>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tabla de Localidades -->
+        <div class="col-lg-8">
+          <div class="mw-card overflow-hidden">
+            <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+              <h5 class="font-heading mb-0 text-dark">Listado de Localidades del Valle</h5>
+              <span class="badge bg-light text-muted border">{{ localities.length }} Registros</span>
+            </div>
+            <div class="table-responsive">
+              @if (localityError) {
+                <div class="alert alert-danger m-3" role="alert">{{ localityError }}</div>
+              } @else if (isLoadingLocalities) {
+                <div class="alert alert-info m-3" role="status">Cargando localidades...</div>
+              } @else {
+              <table class="table table-mw mb-0">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Provincia</th>
+                    <th>Altitud</th>
+                    <th>Cultivos Clave</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (loc of localities; track loc.id) {
+                    <tr>
+                      <td>
+                        <strong class="text-verde-campo">{{ loc.name }}</strong>
+                        @if (loc.active === false) {
+                          <span class="badge bg-secondary extra-small ms-1">Inactiva</span>
+                        }
+                      </td>
+                      <td>{{ loc.province }}</td>
+                      <td>{{ loc.altitudeMeters === null ? 'No disponible' : loc.altitudeMeters + ' msnm' }}</td>
+                      <td>
+                        <small class="text-muted">{{ loc.mainCrops?.join(', ') || 'No disponible en la API' }}</small>
+                      </td>
+                      <td class="text-end text-nowrap">
+                        <button class="btn btn-sm btn-outline-secondary me-1" (click)="consultLocality = loc" title="Consultar">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary me-1" disabled title="La API no tiene endpoint de actualización">
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" disabled title="La API no tiene endpoint de eliminación">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              }
+            </div>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ========================================================================= -->
+    <!-- 2. GESTIÓN DE ALERTAS METEOROLÓGICAS -->
+    <!-- ========================================================================= -->
+    @if (activeTab === 'alertas') {
+      <div class="row g-4 animate-fade-in">
+        
+        <!-- Formulario de Alerta -->
+        <div class="col-lg-5">
+          <div class="mw-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="font-heading mb-0 text-dark">
+                Emitir Nueva Alerta
+              </h5>
+            </div>
+
+            <form [formGroup]="alertForm" (ngSubmit)="saveAlert()">
+              
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label-mw">Tipo de Evento *</label>
+                  <select class="form-select form-select-mw" formControlName="type">
+                    <option value="helada">Helada</option>
+                    <option value="lluvia_intensa">Lluvia Intensa</option>
+                    <option value="temperatura_elevada">Temp. Elevada</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <label class="form-label-mw">Nivel de Riesgo *</label>
+                  <select class="form-select form-select-mw" formControlName="riskLevel">
+                    <option value="bajo">Bajo</option>
+                    <option value="moderado">Moderado</option>
+                    <option value="alto">Alto</option>
+                    <option value="critico">Crítico</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-mw">Localidad del Valle *</label>
+                <select 
+                  class="form-select form-select-mw" 
+                  formControlName="localityId"
+                  [class.is-invalid-mw]="alertForm.get('localityId')?.invalid && alertForm.get('localityId')?.touched">
+                  <option value="">-- Seleccionar Localidad --</option>
+                  @for (loc of localities; track loc.id) {
+                    <option [value]="loc.id">{{ loc.name }} ({{ loc.province }})</option>
+                  }
+                </select>
+                @if (alertForm.get('localityId')?.invalid && alertForm.get('localityId')?.touched) {
+                  <div class="invalid-feedback-mw">Debe seleccionar una localidad.</div>
+                }
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-mw">Descripción Meteorológica Detallada *</label>
+                <textarea 
+                  rows="3" 
+                  class="form-control form-control-mw"
+                  placeholder="Detalles técnicos de temperatura, precipitación, etc."
+                  formControlName="description"
+                  [class.is-invalid-mw]="alertForm.get('description')?.invalid && alertForm.get('description')?.touched"></textarea>
+                @if (alertForm.get('description')?.invalid && alertForm.get('description')?.touched) {
+                  <div class="invalid-feedback-mw">Descripción requerida (mínimo 5 caracteres).</div>
+                }
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-mw-primary" [disabled]="isSavingAlert">
+                  @if (isSavingAlert) {
+                    <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                    Registrando...
+                  } @else {
+                    <i class="bi bi-bell-fill"></i> Emitir Alerta
+                  }
+                </button>
+              </div>
+              <p class="text-muted small mt-3 mb-0">La API almacena tipo, riesgo, localidad y descripción; fecha y estado los asigna el servidor. No hay endpoints para editar o eliminar alertas.</p>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tabla de Alertas -->
+        <div class="col-lg-7">
+          <div class="mw-card overflow-hidden">
+            <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+              <h5 class="font-heading mb-0 text-dark">Registro de Alertas Registradas</h5>
+              <span class="badge bg-light text-muted border">{{ alerts.length }} Alertas</span>
+            </div>
+            <div class="table-responsive">
+              @if (alertError) {
+                <div class="alert alert-danger m-3" role="alert">{{ alertError }}</div>
+              } @else if (isLoadingAlerts) {
+                <div class="alert alert-info m-3" role="status">Cargando alertas...</div>
+              } @else {
+              <table class="table table-mw mb-0">
+                <thead>
+                  <tr>
+                    <th>Tipo / Riesgo</th>
+                    <th>Título / Localidad</th>
+                    <th>Vigencia</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (a of alerts; track a.id) {
+                    <tr>
+                      <td>
+                        <div class="mb-1"><app-alert-type-badge [type]="a.type" [label]="a.typeLabel"></app-alert-type-badge></div>
+                        <app-risk-badge [level]="a.riskLevel" [label]="a.riskLabel"></app-risk-badge>
+                      </td>
+                      <td>
+                        <div class="fw-semibold text-dark">{{ a.title }}</div>
+                        <small class="text-verde-campo fw-semibold"><i class="bi bi-geo-alt me-1"></i>{{ a.localityName }}</small>
+                      </td>
+                      <td>
+                        <small class="text-muted d-block">{{ a.detectedAt }}</small>
+                        <small class="text-muted d-block">Estado: {{ a.status }}</small>
+                      </td>
+                      <td class="text-end text-nowrap">
+                        <button class="btn btn-sm btn-outline-secondary me-1" (click)="consultAlert = a" title="Consultar">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary me-1" (click)="toggleAlertStatus(a)" [disabled]="updatingAlertIds.has(a.id)" [title]="a.isActive ? 'Marcar como atendida' : 'Activar alerta'">
+                          @if (updatingAlertIds.has(a.id)) {
+                            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                          } @else {
+                            <i class="bi" [ngClass]="a.isActive ? 'bi-check-circle' : 'bi-arrow-counterclockwise'"></i>
+                          }
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" disabled title="La API no tiene endpoint de eliminación">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              }
+            </div>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ========================================================================= -->
+    <!-- 3. GESTIÓN DE RECOMENDACIONES AGRÍCOLAS -->
+    <!-- ========================================================================= -->
+    @if (activeTab === 'recomendaciones') {
+      <div class="row g-4 animate-fade-in">
+        <div class="col-12">
+          <div class="alert alert-warning mb-0" role="note">
+            Estas recomendaciones siguen siendo datos locales simulados: la API solo permite registrar una recomendación asociada a un ID de alerta, y la interfaz no dispone de ese vínculo ni de endpoints de consulta.
+          </div>
+        </div>
+        
+        <!-- Formulario de Recomendación -->
+        <div class="col-lg-5">
+          <div class="mw-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="font-heading mb-0 text-dark">
+                {{ editingRecommendationId ? 'Editar Recomendación' : 'Nueva Recomendación Técnica' }}
+              </h5>
+              @if (editingRecommendationId) {
+                <button class="btn btn-sm btn-outline-secondary py-0" (click)="resetAllForms()">
+                  Cancelar
+                </button>
+              }
+            </div>
+
+            <form [formGroup]="recommendationForm" (ngSubmit)="saveRecommendation()">
+              
+              <div class="mb-3">
+                <label class="form-label-mw">Título de la Recomendación *</label>
+                <input 
+                  type="text" 
+                  class="form-control form-control-mw"
+                  placeholder="Ej. Manejo de Aporque Alto ante Lluvias"
+                  formControlName="title"
+                  [class.is-invalid-mw]="recommendationForm.get('title')?.invalid && recommendationForm.get('title')?.touched">
+                @if (recommendationForm.get('title')?.invalid && recommendationForm.get('title')?.touched) {
+                  <div class="invalid-feedback-mw">Título requerido (mínimo 5 letras).</div>
+                }
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label-mw">Cultivo Destino *</label>
+                  <select class="form-select form-select-mw" formControlName="cropId">
+                    <option value="papa">Papa</option>
+                    <option value="maiz">Maíz</option>
+                    <option value="trigo">Trigo</option>
+                    <option value="haba">Haba</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <label class="form-label-mw">Prioridad *</label>
+                  <select class="form-select form-select-mw" formControlName="priority">
+                    <option value="baja">Baja</option>
+                    <option value="media">Media</option>
+                    <option value="alta">Alta</option>
+                    <option value="urgente">Urgente</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-mw">Localidad Asignada *</label>
+                <select 
+                  class="form-select form-select-mw" 
+                  formControlName="localityId"
+                  [class.is-invalid-mw]="recommendationForm.get('localityId')?.invalid && recommendationForm.get('localityId')?.touched">
+                  <option value="">-- Seleccionar Localidad --</option>
+                  @for (loc of localities; track loc.id) {
+                    <option [value]="loc.id">{{ loc.name }} ({{ loc.province }})</option>
+                  }
+                </select>
+                @if (recommendationForm.get('localityId')?.invalid && recommendationForm.get('localityId')?.touched) {
+                  <div class="invalid-feedback-mw">Seleccione una localidad.</div>
+                }
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-mw">Condición Meteorológica Asociada *</label>
+                <input 
+                  type="text" 
+                  class="form-control form-control-mw"
+                  placeholder="Ej. Helada matutina, Suelo saturado"
+                  formControlName="weatherCondition"
+                  [class.is-invalid-mw]="recommendationForm.get('weatherCondition')?.invalid && recommendationForm.get('weatherCondition')?.touched">
+                @if (recommendationForm.get('weatherCondition')?.invalid && recommendationForm.get('weatherCondition')?.touched) {
+                  <div class="invalid-feedback-mw">Condición meteorológica requerida.</div>
+                }
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-mw">Descripción y Diagnóstico *</label>
+                <textarea 
+                  rows="3" 
+                  class="form-control form-control-mw"
+                  placeholder="Explicación del contexto de campo..."
+                  formControlName="description"
+                  [class.is-invalid-mw]="recommendationForm.get('description')?.invalid && recommendationForm.get('description')?.touched"></textarea>
+                @if (recommendationForm.get('description')?.invalid && recommendationForm.get('description')?.touched) {
+                  <div class="invalid-feedback-mw">Descripción requerida (mínimo 15 letras).</div>
+                }
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-mw">Pasos de Acción Agronómica (un paso por línea) *</label>
+                <textarea 
+                  rows="4" 
+                  class="form-control form-control-mw font-monospace small"
+                  placeholder="1. Aplicar riego térmico al atardecer&#10;2. Proteger almácigos con paja&#10;3. No remover tierra"
+                  formControlName="actionSteps"
+                  [class.is-invalid-mw]="recommendationForm.get('actionSteps')?.invalid && recommendationForm.get('actionSteps')?.touched"></textarea>
+                @if (recommendationForm.get('actionSteps')?.invalid && recommendationForm.get('actionSteps')?.touched) {
+                  <div class="invalid-feedback-mw">Indique al menos un paso de acción.</div>
+                }
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-mw">Especialista / Entidad Autora *</label>
+                <input type="text" class="form-control form-control-mw" formControlName="author">
+              </div>
+
+              <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="recActive" formControlName="isActive">
+                <label class="form-check-label small" for="recActive">
+                  Publicar como recomendación activa
+                </label>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-mw-primary">
+                  <i class="bi" [ngClass]="editingRecommendationId ? 'bi-check2' : 'bi-plus-circle'"></i>
+                  {{ editingRecommendationId ? 'Guardar Cambios' : 'Registrar Recomendación' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tabla de Recomendaciones -->
+        <div class="col-lg-7">
+          <div class="mw-card overflow-hidden">
+            <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+              <h5 class="font-heading mb-0 text-dark">Recomendaciones Registradas</h5>
+              <span class="badge bg-light text-muted border">{{ recommendations.length }} Registros</span>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-mw mb-0">
+                <thead>
+                  <tr>
+                    <th>Título / Cultivo</th>
+                    <th>Localidad</th>
+                    <th>Prioridad</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (r of recommendations; track r.id) {
+                    <tr>
+                      <td>
+                        <strong class="text-dark">{{ r.title }}</strong>
+                        <small class="text-muted d-block">Cultivo: {{ r.cropName }}</small>
+                      </td>
+                      <td>
+                        <span class="text-verde-campo fw-semibold">{{ r.localityName }}</span>
+                        <small class="text-muted d-block">{{ r.weatherCondition }}</small>
+                      </td>
+                      <td>
+                        <span class="badge" 
+                              [ngClass]="r.priority === 'urgente' ? 'bg-danger' : r.priority === 'alta' ? 'bg-warning text-dark' : 'bg-info text-dark'">
+                          {{ r.priority | uppercase }}
+                        </span>
+                      </td>
+                      <td class="text-end text-nowrap">
+                        <button class="btn btn-sm btn-outline-secondary me-1" (click)="consultRecommendation = r" title="Consultar">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary me-1" (click)="editRecommendation(r)" title="Editar">
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" (click)="askDelete('recomendaciones', r.id, r.title)" title="Eliminar">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODALES DE CONSULTA -->
+<!-- ========================================================================= -->
+
+<!-- Modal Consulta Localidad -->
+@if (consultLocality) {
+  <div class="mw-modal-backdrop animate-fade-in" (click)="consultLocality = null">
+    <div class="mw-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="mw-modal-header">
+        <h5 class="font-heading mb-0 text-dark">Detalle de Localidad: {{ consultLocality.name }}</h5>
+        <button type="button" class="btn-close shadow-none" (click)="consultLocality = null"></button>
+      </div>
+      <div class="mw-modal-body">
+        <div class="row g-2 mb-3 small">
+          <div class="col-6 p-2 bg-light rounded border">
+            <span class="text-muted d-block">Provincia:</span>
+            <strong>{{ consultLocality.province }}</strong>
+          </div>
+          @if (consultLocality.altitudeMeters !== null) {
+          <div class="col-6 p-2 bg-light rounded border">
+            <span class="text-muted d-block">Altitud:</span>
+            <strong>{{ consultLocality.altitudeMeters }} msnm</strong>
+          </div>
+          }
+          @if (consultLocality.latitude !== undefined && consultLocality.longitude !== undefined) {
+          <div class="col-6 p-2 bg-light rounded border">
+            <span class="text-muted d-block">Coordenadas:</span>
+            <span>Lat: {{ consultLocality.latitude }} · Lon: {{ consultLocality.longitude }}</span>
+          </div>
+          }
+          @if (consultLocality.active !== undefined) {
+          <div class="col-6 p-2 bg-light rounded border">
+            <span class="text-muted d-block">Estado:</span>
+            <span [ngClass]="consultLocality.active ? 'text-success fw-bold' : 'text-danger'">
+              {{ consultLocality.active ? 'Activa en selector' : 'Inactiva' }}
+            </span>
+          </div>
+          }
+        </div>
+        @if (consultLocality.mainCrops?.length) {
+        <h6 class="fw-bold mb-1">Cultivos Principales Monitoreados:</h6>
+        <div class="d-flex flex-wrap gap-1">
+          @for (c of consultLocality.mainCrops ?? []; track c) {
+            <span class="badge bg-verde-campo text-white">{{ c }}</span>
+          }
+        </div>
+        } @else {
+          <p class="text-muted small mb-0">La API no proporciona cultivos asociados a esta localidad.</p>
+        }
+      </div>
+      <div class="mw-modal-footer">
+        <button class="btn btn-sm btn-secondary" (click)="consultLocality = null">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Consulta Alerta -->
+@if (consultAlert) {
+  <div class="mw-modal-backdrop animate-fade-in" (click)="consultAlert = null">
+    <div class="mw-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="mw-modal-header">
+        <h5 class="font-heading mb-0 text-dark">{{ consultAlert.title }}</h5>
+        <button type="button" class="btn-close shadow-none" (click)="consultAlert = null"></button>
+      </div>
+      <div class="mw-modal-body">
+        <div class="d-flex gap-2 mb-3">
+          <app-alert-type-badge [type]="consultAlert.type" [label]="consultAlert.typeLabel"></app-alert-type-badge>
+          <app-risk-badge [level]="consultAlert.riskLevel" [label]="consultAlert.riskLabel"></app-risk-badge>
+        </div>
+        <div class="p-2 bg-light rounded border mb-3 small">
+          <div><strong>Localidad:</strong> {{ consultAlert.localityName }}</div>
+          <div><strong>Registro:</strong> {{ consultAlert.detectedAt }}</div>
+          <div><strong>Estado:</strong> {{ consultAlert.status }}</div>
+        </div>
+        <h6 class="fw-bold mb-1">Descripción:</h6>
+        <p class="small text-secondary mb-3">{{ consultAlert.description }}</p>
+        @if (consultAlert.preventiveRecommendation) {
+        <h6 class="fw-bold mb-1 text-tierra">Recomendación Preventiva:</h6>
+        <div class="p-3 bg-crema-surface border border-tierra small mb-3">{{ consultAlert.preventiveRecommendation }}</div>
+        }
+        @if (consultAlert.affectedCrops?.length) {
+        <h6 class="fw-bold mb-1">Cultivos Afectados:</h6>
+        <div class="d-flex flex-wrap gap-1">
+          @for (c of consultAlert.affectedCrops ?? []; track c) {
+            <span class="badge bg-verde-campo text-white">{{ c }}</span>
+          }
+        </div>
+        }
+      </div>
+      <div class="mw-modal-footer">
+        <button class="btn btn-sm btn-secondary" (click)="consultAlert = null">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Consulta Recomendación -->
+@if (consultRecommendation) {
+  <div class="mw-modal-backdrop animate-fade-in" (click)="consultRecommendation = null">
+    <div class="mw-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="mw-modal-header">
+        <h5 class="font-heading mb-0 text-dark">{{ consultRecommendation.title }}</h5>
+        <button type="button" class="btn-close shadow-none" (click)="consultRecommendation = null"></button>
+      </div>
+      <div class="mw-modal-body">
+        <div class="d-flex gap-2 mb-3">
+          <span class="badge bg-verde-salvia text-dark">Cultivo: {{ consultRecommendation.cropName }}</span>
+          <span class="badge bg-light text-dark border">Localidad: {{ consultRecommendation.localityName }}</span>
+          <span class="badge bg-danger-subtle text-danger">Prioridad: {{ consultRecommendation.priority | uppercase }}</span>
+        </div>
+        <p class="small text-secondary mb-3">{{ consultRecommendation.description }}</p>
+        <h6 class="fw-bold mb-2 text-verde-campo">Pasos de Acción para el Agricultor:</h6>
+        <ol class="small mb-3 ps-3">
+          @for (step of consultRecommendation.actionSteps; track step) {
+            <li class="mb-1">{{ step }}</li>
+          }
+        </ol>
+        <div class="small text-muted border-top pt-2">
+          <strong>Emisor:</strong> {{ consultRecommendation.author }} ({{ consultRecommendation.createdAt }})
+        </div>
+      </div>
+      <div class="mw-modal-footer">
+        <button class="btn btn-sm btn-secondary" (click)="consultRecommendation = null">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de Confirmación de Eliminación -->
+@if (deleteTarget) {
+  <div class="mw-modal-backdrop animate-fade-in" (click)="cancelDelete()">
+    <div class="mw-modal-dialog" style="max-width: 450px;" (click)="$event.stopPropagation()">
+      <div class="mw-modal-header bg-danger-subtle">
+        <h5 class="modal-title font-heading mb-0 text-danger">
+          <i class="bi bi-trash3-fill me-1"></i> Confirmar Eliminación
+        </h5>
+        <button type="button" class="btn-close shadow-none" (click)="cancelDelete()"></button>
+      </div>
+      <div class="mw-modal-body">
+        <p class="mb-0">
+          ¿Está seguro de que desea eliminar el registro <strong>"{{ deleteTarget.name }}"</strong>?
+        </p>
+        <small class="text-muted d-block mt-2">Esta acción eliminará el elemento de la simulación en memoria.</small>
+      </div>
+      <div class="mw-modal-footer">
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelDelete()">Cancelar</button>
+        <button type="button" class="btn btn-sm btn-danger" (click)="confirmDelete()">
+          <i class="bi bi-trash"></i> Eliminar Definitivamente
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,387 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Paleta Oficial METEO WANKA */
+  --mw-verde-campo: #355C43;
+  --mw-verde-campo-dark: #264330;
+  --mw-verde-campo-light: #447455;
+  --mw-verde-salvia: #91A58B;
+  --mw-verde-salvia-light: #E7EDE6;
+  --mw-crema-natural: #F5F1E7;
+  --mw-crema-surface: #FAF7F0;
+  --mw-tierra: #B77B52;
+  --mw-tierra-dark: #915E39;
+  --mw-tierra-light: #F4EAE2;
+  --mw-grafito: #303630;
+  --mw-grafito-muted: #606860;
+  --mw-border: #DCD6C8;
+
+  /* Colores de Alertas y Riesgos */
+  --mw-alerta-helada: #1D6F8A;
+  --mw-alerta-helada-bg: #E3F2F7;
+  --mw-alerta-lluvia: #2B5876;
+  --mw-alerta-lluvia-bg: #E6EEF4;
+  --mw-alerta-calor: #C86422;
+  --mw-alerta-calor-bg: #FCF1E8;
+
+  --mw-riesgo-bajo: #355C43;
+  --mw-riesgo-moderado: #B77B52;
+  --mw-riesgo-alto: #C85A17;
+  --mw-riesgo-critico: #A62B2B;
+
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Lora', Georgia, serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--mw-crema-natural);
+  color: var(--mw-grafito);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-serif);
+  color: var(--mw-verde-campo-dark);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+h5, h6 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--mw-grafito);
+}
+
+a {
+  color: var(--mw-verde-campo);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--mw-verde-campo-dark);
+}
+
+/* Tarjetas y Contenedores */
+.mw-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--mw-border);
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(48, 54, 48, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mw-card:hover {
+  box-shadow: 0 6px 18px rgba(48, 54, 48, 0.08);
+}
+
+.mw-card-warm {
+  background-color: var(--mw-crema-surface);
+  border: 1px solid var(--mw-border);
+  border-radius: 12px;
+}
+
+/* Botones con estilo propio */
+.btn-mw-primary {
+  background-color: var(--mw-verde-campo);
+  color: #FFFFFF;
+  border: 1px solid var(--mw-verde-campo-dark);
+  font-weight: 500;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-mw-primary:hover, .btn-mw-primary:focus {
+  background-color: var(--mw-verde-campo-dark);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(53, 92, 67, 0.3);
+}
+
+.btn-mw-secondary {
+  background-color: #FFFFFF;
+  color: var(--mw-verde-campo);
+  border: 1px solid var(--mw-verde-campo);
+  font-weight: 500;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-mw-secondary:hover {
+  background-color: var(--mw-verde-salvia-light);
+  color: var(--mw-verde-campo-dark);
+}
+
+.btn-mw-tierra {
+  background-color: var(--mw-tierra);
+  color: #FFFFFF;
+  border: 1px solid var(--mw-tierra-dark);
+  font-weight: 500;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-mw-tierra:hover {
+  background-color: var(--mw-tierra-dark);
+  color: #FFFFFF;
+}
+
+.btn-mw-outline-tierra {
+  background-color: transparent;
+  color: var(--mw-tierra);
+  border: 1px solid var(--mw-tierra);
+  border-radius: 8px;
+}
+
+.btn-mw-outline-tierra:hover {
+  background-color: var(--mw-tierra-light);
+  color: var(--mw-tierra-dark);
+}
+
+/* Badges de Riesgo y Alerta */
+.badge-mw {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-transform: uppercase;
+}
+
+.badge-riesgo-bajo {
+  background-color: #E2ECE5;
+  color: #244630;
+  border: 1px solid #C4D9CA;
+}
+
+.badge-riesgo-moderado {
+  background-color: #F8EFE7;
+  color: #8C4E23;
+  border: 1px solid #ECD7C6;
+}
+
+.badge-riesgo-alto {
+  background-color: #FBECE4;
+  color: #B2450C;
+  border: 1px solid #F5CEB9;
+}
+
+.badge-riesgo-critico {
+  background-color: #F8E3E3;
+  color: #8A1A1A;
+  border: 1px solid #EBB4B4;
+}
+
+.badge-alerta-helada {
+  background-color: var(--mw-alerta-helada-bg);
+  color: var(--mw-alerta-helada);
+  border: 1px solid #B8DCED;
+}
+
+.badge-alerta-lluvia {
+  background-color: var(--mw-alerta-lluvia-bg);
+  color: var(--mw-alerta-lluvia);
+  border: 1px solid #BCD3E3;
+}
+
+.badge-alerta-calor {
+  background-color: var(--mw-alerta-calor-bg);
+  color: var(--mw-alerta-calor);
+  border: 1px solid #F6D6BE;
+}
+
+/* Tablas con identidad agroclimática */
+.table-mw {
+  background-color: #FFFFFF;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.table-mw th {
+  background-color: var(--mw-verde-salvia-light);
+  color: var(--mw-verde-campo-dark);
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.85rem 1rem;
+  border-bottom: 2px solid var(--mw-border);
+}
+
+.table-mw td {
+  padding: 0.9rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #EDE8DE;
+  font-size: 0.9rem;
+}
+
+.table-mw tbody tr:hover {
+  background-color: #FAF8F3;
+}
+
+/* Formularios */
+.form-label-mw {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--mw-grafito);
+  margin-bottom: 0.35rem;
+}
+
+.form-control-mw, .form-select-mw {
+  background-color: #FFFFFF;
+  border: 1px solid var(--mw-border);
+  border-radius: 8px;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.92rem;
+  color: var(--mw-grafito);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control-mw:focus, .form-select-mw:focus {
+  border-color: var(--mw-verde-campo);
+  box-shadow: 0 0 0 3px rgba(53, 92, 67, 0.15);
+  outline: none;
+}
+
+.is-invalid-mw {
+  border-color: #C83232 !important;
+}
+
+.invalid-feedback-mw {
+  font-size: 0.8rem;
+  color: #A62B2B;
+  margin-top: 0.25rem;
+}
+
+/* Banner de Datos Simulados */
+.banner-mock-data {
+  background-color: #FFF9ED;
+  border-bottom: 1px solid #EEDBB2;
+  color: #7D5A12;
+  font-size: 0.82rem;
+  padding: 0.4rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Backdrop para modales manuales */
+.mw-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(30, 40, 32, 0.55);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.mw-modal-dialog {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid var(--mw-border);
+  width: 100%;
+  max-width: 650px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mw-modal-header {
+  background-color: var(--mw-crema-surface);
+  border-bottom: 1px solid var(--mw-border);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mw-modal-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.mw-modal-footer {
+  background-color: #FAF8F4;
+  border-top: 1px solid var(--mw-border);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Indicadores de Clima */
+.weather-hero-card {
+  background: linear-gradient(145deg, #FFFFFF 0%, var(--mw-crema-surface) 100%);
+  border: 1px solid var(--mw-border);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.weather-metric-box {
+  background-color: #FFFFFF;
+  border: 1px solid #EAE3D5;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.weather-metric-box:hover {
+  transform: translateY(-2px);
+  border-color: var(--mw-verde-salvia);
+}
+
+.weather-metric-val {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--mw-verde-campo-dark);
+  line-height: 1.1;
+}
+
+.weather-metric-label {
+  font-size: 0.78rem;
+  color: var(--mw-grafito-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 0.25rem;
+}
+
+/* Animaciones suaves */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}

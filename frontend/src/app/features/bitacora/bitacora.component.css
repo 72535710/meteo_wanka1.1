@@ -1,0 +1,20 @@
+.bg-verde-salvia {
+  background-color: var(--mw-verde-salvia-light);
+  border: 1px solid var(--mw-verde-salvia);
+}
+
+.text-verde-campo {
+  color: var(--mw-verde-campo);
+}
+
+.text-tierra {
+  color: var(--mw-tierra);
+}
+
+.bg-crema-surface {
+  background-color: var(--mw-crema-surface);
+}
+
+.bg-verde-campo {
+  background-color: var(--mw-verde-campo);
+}

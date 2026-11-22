@@ -1,0 +1,72 @@
+.summary-stat-card {
+  background-color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.summary-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(48, 54, 48, 0.08);
+}
+
+.summary-stat-card.active-filter {
+  border-color: var(--mw-verde-campo) !important;
+  box-shadow: 0 0 0 2px var(--mw-verde-campo);
+}
+
+.stat-icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bg-helada-icon {
+  background-color: var(--mw-alerta-helada-bg);
+  color: var(--mw-alerta-helada);
+}
+
+.bg-lluvia-icon {
+  background-color: var(--mw-alerta-lluvia-bg);
+  color: var(--mw-alerta-lluvia);
+}
+
+.bg-calor-icon {
+  background-color: var(--mw-alerta-calor-bg);
+  color: var(--mw-alerta-calor);
+}
+
+.extra-small {
+  font-size: 0.74rem;
+}
+
+.border-risk-critico {
+  border-left: 4px solid var(--mw-riesgo-critico) !important;
+}
+
+.border-risk-alto {
+  border-left: 4px solid var(--mw-riesgo-alto) !important;
+}
+
+.border-risk-moderado {
+  border-left: 4px solid var(--mw-riesgo-moderado) !important;
+}
+
+.border-risk-bajo {
+  border-left: 4px solid var(--mw-riesgo-bajo) !important;
+}
+
+.text-tierra {
+  color: var(--mw-tierra);
+}
+
+.bg-crema-surface {
+  background-color: var(--mw-crema-surface);
+}
+
+.bg-verde-campo {
+  background-color: var(--mw-verde-campo);
+}

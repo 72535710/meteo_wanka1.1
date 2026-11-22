@@ -1,0 +1,86 @@
+.hero-valley {
+  background: linear-gradient(135deg, rgba(38, 67, 48, 0.94) 0%, rgba(53, 92, 67, 0.90) 100%),
+              url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at top right, rgba(183, 123, 82, 0.3) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-stats-badge {
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.text-verde-campo {
+  color: var(--mw-verde-campo);
+}
+
+.border-verde-campo {
+  border-color: var(--mw-verde-campo) !important;
+}
+
+.bg-crema-surface {
+  background-color: var(--mw-crema-surface);
+}
+
+.border-tierra {
+  border-color: var(--mw-tierra) !important;
+}
+
+.bg-tierra-subtle {
+  background-color: var(--mw-tierra-light);
+}
+
+.text-tierra {
+  color: var(--mw-tierra);
+}
+
+.weather-big-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.step-number {
+  background-color: var(--mw-verde-campo);
+  color: #FFFFFF;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.forecast-card {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.forecast-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--mw-verde-salvia);
+}
+
+.forecast-icon-box {
+  color: var(--mw-verde-campo);
+}
+
+.forecast-summary {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -1,0 +1,176 @@
+<div class="cultivos-page py-4">
+  <div class="container">
+    
+    <!-- Encabezado de Cultivos -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+      <div>
+        <span class="badge bg-success-subtle text-success fw-semibold px-2 py-1 mb-1">
+          <i class="bi bi-flower1 me-1"></i> Guía Agronómica Andina
+        </span>
+        <h1 class="display-6 font-heading mb-1 text-dark">Fichas Agroclimáticas de Cultivos</h1>
+        <p class="text-muted mb-0 small">
+          Manual técnico de vulnerabilidades meteorológicas y recomendaciones de manejo para los 4 cultivos pilares del Valle del Mantaro.
+        </p>
+      </div>
+    </div>
+    <div class="alert alert-secondary small" role="note">
+      Fichas locales de referencia. El backend actual no ofrece un endpoint de consulta para el catálogo de cultivos.
+    </div>
+
+    <!-- Navegación de Pestañas de Cultivos -->
+    <div class="crop-tabs-wrapper mb-4">
+      <div class="row g-2">
+        @for (crop of crops; track crop.id) {
+          <div class="col-6 col-md-3">
+            <button 
+              type="button" 
+              class="crop-nav-btn w-100 p-3 rounded-3 text-start d-flex align-items-center gap-3"
+              [class.active-crop]="selectedCrop?.id === crop.id"
+              (click)="selectCrop(crop)">
+              <div class="crop-nav-thumbnail">
+                <img [src]="crop.imageUrl" [alt]="crop.name" class="rounded-circle object-fit-cover">
+              </div>
+              <div>
+                <span class="d-block fw-bold text-dark fs-6">{{ crop.name }}</span>
+                <span class="d-block text-muted extra-small fst-italic">{{ crop.scientificName }}</span>
+              </div>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Detalle Exhaustivo del Cultivo Seleccionado -->
+    @if (selectedCrop) {
+      <div class="mw-card p-4 p-lg-5 mb-5 animate-fade-in">
+        
+        <!-- Fila Superior: Fotografía, Ficha y Parámetros -->
+        <div class="row g-4 align-items-center mb-4 pb-4 border-bottom">
+          <div class="col-lg-5">
+            <div class="crop-hero-image-wrap rounded-4 overflow-hidden shadow-sm position-relative">
+              <img [src]="selectedCrop.imageUrl" [alt]="selectedCrop.name" class="img-fluid w-100 object-fit-cover" style="height: 320px;">
+              <div class="crop-image-badge position-absolute bottom-0 start-0 m-3 p-2 px-3 rounded-3 bg-dark bg-opacity-75 text-white small">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Valle del Mantaro · {{ selectedCrop.altitudeRange }}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-verde-salvia text-dark fw-semibold">Cultivo Prioritario</span>
+              <span class="badge bg-light text-muted border">Ciclo: {{ selectedCrop.growthCycleDays }}</span>
+            </div>
+
+            <h2 class="display-6 font-heading mb-1 text-verde-campo">{{ selectedCrop.name }}</h2>
+            <div class="fst-italic text-muted fs-6 mb-3">{{ selectedCrop.scientificName }}</div>
+
+            <p class="text-secondary mb-4 leading-relaxed">
+              {{ selectedCrop.description }}
+            </p>
+
+            <div class="row g-2 small">
+              <div class="col-sm-6">
+                <div class="p-2 rounded bg-crema-surface border">
+                  <span class="text-muted d-block extra-small text-uppercase fw-semibold">Variedades en el Mantaro:</span>
+                  <span class="fw-semibold text-dark">{{ selectedCrop.typicalVarieties.join(', ') }}</span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-2 rounded bg-crema-surface border">
+                  <span class="text-muted d-block extra-small text-uppercase fw-semibold">Requerimiento Hídrico:</span>
+                  <span class="fw-semibold text-dark">{{ selectedCrop.waterRequirement }}</span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-2 rounded bg-crema-surface border">
+                  <span class="text-muted d-block extra-small text-uppercase fw-semibold">Temperatura Óptima:</span>
+                  <span class="fw-semibold text-dark">{{ selectedCrop.optimalTempRange }}</span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="p-2 rounded bg-crema-surface border">
+                  <span class="text-muted d-block extra-small text-uppercase fw-semibold">Presencia Regional:</span>
+                  <span class="fw-semibold text-dark">{{ selectedCrop.importanceInMantaro }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección 1: Riesgos Meteorológicos Específicos -->
+        <div class="mb-5">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-exclamation-triangle-fill text-tierra fs-4"></i>
+            <h4 class="font-heading mb-0 text-dark">Riesgos Meteorológicos y Fitosanitarios Frecuentes</h4>
+          </div>
+          <p class="text-muted small mb-3">
+            Factores climáticos que impactan de forma crítica el rendimiento y sanidad del cultivo de {{ selectedCrop.name }}:
+          </p>
+
+          <div class="row g-3">
+            @for (risk of selectedCrop.meteorologicalRisks; track risk.type) {
+              <div class="col-md-4">
+                <div class="mw-card p-3 h-100 border-start border-4"
+                     [ngClass]="risk.severity === 'critico' ? 'border-danger' : risk.severity === 'alto' ? 'border-warning' : 'border-info'">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge" [ngClass]="risk.severity === 'critico' ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning-emphasis'">
+                      Severidad {{ risk.severity | uppercase }}
+                    </span>
+                  </div>
+                  <h5 class="fw-bold fs-6 mb-2 text-dark">{{ risk.type }}</h5>
+                  
+                  <div class="small text-muted mb-2">
+                    <strong>Fase crítica:</strong> {{ risk.criticalStages }}
+                  </div>
+
+                  <div class="small text-secondary mb-3">
+                    <strong>Síntomas en planta:</strong> {{ risk.symptoms }}
+                  </div>
+
+                  <div class="p-2 rounded bg-crema-surface small text-dark border">
+                    <strong class="text-tierra"><i class="bi bi-shield-check me-1"></i>Medida preventiva:</strong> {{ risk.countermeasure }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Sección 2: Recomendaciones Agronómicas por Etapas -->
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-calendar-check-fill text-verde-campo fs-4"></i>
+            <h4 class="font-heading mb-0 text-dark">Calendario de Recomendaciones Agrícolas Preventivas</h4>
+          </div>
+          <p class="text-muted small mb-3">
+            Manejo agronómico programado para mitigar pérdidas por eventos climáticos extremos en el Valle del Mantaro:
+          </p>
+
+          <div class="row g-3">
+            @for (rec of selectedCrop.preventiveRecommendations; track rec.stage; let idx = $index) {
+              <div class="col-md-6 col-lg-3">
+                <div class="mw-card-warm p-3 h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="stage-step-tag">Etapa {{ idx + 1 }}</span>
+                      <span class="badge bg-white text-muted border small">{{ rec.timing }}</span>
+                    </div>
+
+                    <h5 class="fw-bold fs-6 text-verde-campo mb-2">{{ rec.stage }}</h5>
+                    <div class="fw-semibold small text-dark mb-2">{{ rec.action }}</div>
+                    
+                    <p class="text-secondary extra-small mb-0">
+                      {{ rec.details }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>
